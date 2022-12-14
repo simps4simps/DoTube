@@ -9,7 +9,8 @@ class Mainwindow(QtWidgets.QWidget):
         super().__init__()
         self.height = 10
         # Main Window Properties
-        self.setGeometry(100, 100, 1000, 600)
+        self.setFixedHeight(400)
+        self.setFixedWidth(1000)
         self.counter = 0
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
         self.setObjectName("Mainwindow")
@@ -111,11 +112,15 @@ class Mainwindow(QtWidgets.QWidget):
         self.frame1 = QtWidgets.QFrame(self)
         self.vbox = QtWidgets.QVBoxLayout(self)
         self.hbox = QtWidgets.QHBoxLayout(self)
+        self.vbox2 = QtWidgets.QVBoxLayout(self)
         self.framespace = QtWidgets.QFrame(self)
         
+        
         # Adding Items To Layout
-        self.vbox.addWidget(self.frame1)
-        self.frame1.setFixedHeight(self.height)
+        self.vbox2.addWidget(self.frame1)
+        self.frame1.setStyleSheet('border: 1px solid gray; border-radius: 10px;')
+        self.frame1.setFixedHeight(25)
+        self.frame1.setFixedWidth(999)
         self.setLayout(self.vbox)
         self.hbox.addWidget(self.exit_button)
         self.hbox.addWidget(self.full_Screen)
@@ -128,6 +133,9 @@ class Mainwindow(QtWidgets.QWidget):
         self.vbox.setContentsMargins(0,0,0,0)
         self.hbox.setContentsMargins(3, 0, 3, 3)
         self.hbox.setAlignment(QtCore.Qt.AlignTop)
+        widthI = 800
+        self.vbox.setAlignment(QtCore.Qt.AlignCenter)
+        self.entry.setFixedWidth(widthI)
         self.oldpos = self.frame1.pos()
         self.show()
 
