@@ -164,25 +164,28 @@ class Mainwindow(QtWidgets.QWidget):
             self.move(x-x_w,y-y_w)
             
     def download(self):
-        try:
-            self.status.setText('Downloading please dont close the app when it freezes!')
-            self.url = self.entry.text()
+        self.status.setText('Downloading please dont close the app when it freezes!')
+        self.url = self.entry.text()
 
-            ydl_opts = {}
-            channel = 1
-            while (channel == int(1)):
-                link_of_the_video = self.url
-                zxt = link_of_the_video.strip()
+        self.ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+            }],
+            'prefer_ffmpeg': True,
+            'keepvideo': True
+        }
+
+        self.link_of_the_video = self.url
+        self.zxt = self.link_of_the_video.strip()
             
-                dwl_vid()
+        self.dwl_vid()
             
-            self.status.setText('Download completed!')
-        except:
-            self.status.setText('Oops! Something went wrong. Maybe your URL?')
+        self.status.setText('Download completed!')
             
-    def dwl_vid():
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([zxt])
+    def dwl_vid(self):
+        with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
+            ydl.download([self.zxt])
             
         
         
