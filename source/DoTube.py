@@ -2,9 +2,12 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 import sys
+import time
 import youtube_dl
 import os
 import ffmpeg
+import threading
+
 
 class Mainwindow(QtWidgets.QWidget):
     def __init__(self):
@@ -22,6 +25,8 @@ class Mainwindow(QtWidgets.QWidget):
             }
         """)
         self.center()
+        
+        self.threads = []
 
         # Define Tools
         self.exit_button = QtWidgets.QPushButton("", clicked=lambda: self.quitprogram())
@@ -79,7 +84,7 @@ class Mainwindow(QtWidgets.QWidget):
                                 border: 1px solid #f0f0f0;
                             }
                         """)
-        self.submit = QtWidgets.QPushButton("Download", clicked=lambda: self.download())
+        self.submit = QtWidgets.QPushButton("Download", clicked=lambda: self.thread())
         self.submit.setStyleSheet("""
                             QPushButton{
                                 background: #ff3030;
@@ -135,6 +140,10 @@ class Mainwindow(QtWidgets.QWidget):
         self.oldpos = self.frame1.pos()
         self.show()
 
+    def thread(self):
+        t1 = threading.Thread(target=self.download)
+        t1.start()
+        
     def quitprogram(self):
         sys.exit()
 
@@ -164,11 +173,16 @@ class Mainwindow(QtWidgets.QWidget):
             self.move(x-x_w,y-y_w)
             
     def download(self):
-        self.status.setText('Downloading please dont close the app when it freezes!')
         self.url = self.entry.text()
 
         self.ydl_opts = {
-            'format': 'bestaudio/best',
+            'format': '136',
+            'outtmpl': '..\\downloads\\%(title)s.%(ext)s',
+        }
+        
+        self.ydl_audio_opts = {
+            'foramt' : 'bestaudio/best',
+            'outtmpl': '..\\downloads\\%(title)s.%(ext)s',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
             }],
@@ -179,14 +193,36 @@ class Mainwindow(QtWidgets.QWidget):
         self.link_of_the_video = self.url
         self.zxt = self.link_of_the_video.strip()
             
-        self.dwl_vid()
-            
-        self.status.setText('Download completed!')
+        t2 = threading.Thread(target= self.dwl_vid)
+        t2.start()
             
     def dwl_vid(self):
-        with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
-            ydl.download([self.zxt])
+        self.status.setText('Downloading please dont close the app when it freezes!')
+        time.sleep(3)
+        
+        try:
+            ydl_opts = {}
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(self.zxt, download=False)
+                video_title = info_dict.get('title', None)
             
+            with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
+                ydl.download([self.zxt])
+                
+                self.myh
+            
+            with youtube_dl.YoutubeDL(self.ydl_audio_opts) as ydl:
+                ydl.download([self.zxt])
+            
+            os.chdir('../downloads')
+            
+            for item in os.listdir(os.getcwd()):
+                if item != f'{video_title}.mkv':
+                    os.remove(item)
+                    
+            self.status.setText('Download completed! you file is downloaded at DoTube/downloads !')
+        except:
+            self.status.setText('Something went wrong!')
         
         
         
